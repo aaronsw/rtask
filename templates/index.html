@@ -14,7 +14,7 @@ form { margin: 0; display: inline;}
 
 .remaining { font-style: italic; padding-left: 1em; }
 
-#focus { background-color: #ff9; padding: .5em 1em; margin: 1em; }
+#focus { background-color: #ffd; padding: .5em 1em; margin: 1em; }
 #focus table { width: 100%;}
 #focus .options { padding-top: .5em;}
 
@@ -60,10 +60,11 @@ $if focusl:
         </tr><tr>
           <td></td>
           <td class="options">
-            <button name="stall" value="t" type="submit">handle</button>
-            <button class="postpone_button">postpone</button>
-            <button name="finished" value="gaveup">give up</button>
-            <button onclick="alert('not implemented yet'); return false">delegate</button>
+            <button style="background-color: #afa" name="stall" value="t" type="submit">handle</button>
+            <button style="background-color: #ffa" class="postpone_button">postpone</button>
+            <button style="background-color: #B8E6FF" onclick="alert('not implemented yet'); return false">delegate</button>
+            <button style="background-color: #faa" name="finished" value="gaveup">give up</button>
+            <button onclick="alert('not implemented yet'); return false">make a project</button>
         </td>
     </tr><tr class="postponement"><td></td><td>
       postpone until:
