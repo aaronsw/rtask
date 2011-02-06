@@ -1,0 +1,90 @@
+$def with (focus)
+<title>rtask</title>
+<style type="text/css">
+html { font-family: "Lucida Grande"; }
+
+#focus { padding: .5em 1em; background-color: #ff9; margin: 1em; }
+#focus .text { font-size: 20px;}
+#focus .text input[type="checkbox"] { }
+button { border: 0; background-color: #ccc; }
+.options { padding-top: .5em;}
+
+#focus .context { text-align: right; color: #777;}
+
+form { margin: 0;}
+#focus table { width: 80%;}
+#item_name { border: 1px solid transparent; padding: 4px 5px;}
+#item_name:hover { border: 1px solid black; background-color: #ffc;}
+#item_name_edit { display: none; }
+#item_name_edit input[type="text"] { border: 1px solid black; font-size: 20px; padding: 4px; width: 90%; margin: 0; }
+#item_name_edit button { font-size: 20px;}
+
+#focus .info { float: right; color: #777; }
+#focus .box { margin-top: 1em;}
+#focus .project { color: #777;}
+
+.remaining { padding-left: 1em; color: #777;}
+
+.red { background-color: #f33; font-weight: bold; color: white; border: 2px solid #c00;}
+
+.infoline * { font-size: 15px;}
+#mainbox { width: 20em;}
+
+
+</style>
+
+<p class="remaining"><strong>7 left to go...</strong></p>
+
+<div id="focus">
+<div class="info">
+    $datestr(focus.created)
+    <!--@@postponed x times-->
+</div>
+<div class="project">
+    project:
+    $if focus.project_id:
+        <a href="/projects/$focus.project_id">$focus.project_id</a> [x]
+    $else:
+        ...
+        
+</div>
+
+<table class="box"><tr class="text">
+    <td style="width: 1px"><input type="checkbox" /></td>
+    <td>
+        <div id="item_name" onclick="edit_item('item_name')" class="editable">$focus.name</div>
+        <div id="item_name_edit">
+            <form method="post" action="/edit_name">
+                <input type="hidden" name="id" value="$focus.id" />
+                <input type="text" name="name" value="$focus.name" onfocus='this.value=this.value' />
+                <button type="submit">save</button>
+            </form>
+        </div>
+    </td>
+</tr><tr>
+    <td></td>
+    <td class="options">
+        <button>stall</button>
+        <button>postpone</button>
+        <button>give up</button>
+        <button>delegate</button>
+    </td>
+</tr>
+</table>
+<div class="context">context: ...</div>
+</div>
+
+
+<form method="post" action="/add">
+
+<div class="infoline"><button class="red">RESET</button> <input id="mainbox" type="text" name="text"> <button type="submit">Add</button></div>
+
+
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.0/jquery.min.js"></script>
+<script type="text/javascript">
+function edit_item(n){
+    $$('#' + n)[0].style.display='none'
+    $$('#' + n+'_edit')[0].style.display='block'
+    $$('#' + n+'_edit input[type="text"]')[0].focus()
+}
+</script>
