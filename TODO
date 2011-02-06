@@ -1,0 +1,17 @@
+track postponements
+  show postponement counts
+
+context and project
+  autocomplete
+    autocomplete should be case-insensitive
+    autocomplete should bold matching part
+  pages
+  sidebar
+
+reordering
+
+dependencies
+
+better design
+
+fast forward on tasks

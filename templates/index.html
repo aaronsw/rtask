@@ -1,90 +1,163 @@
-$def with (focus)
+$def with (focusl, stalled)
 <title>rtask</title>
 <style type="text/css">
 html { font-family: "Lucida Grande"; }
+button { border: 1px solid #979797; background-color: #ccc; }
+form { margin: 0; display: inline;}
 
-#focus { padding: .5em 1em; background-color: #ff9; margin: 1em; }
-#focus .text { font-size: 20px;}
-#focus .text input[type="checkbox"] { }
-button { border: 0; background-color: #ccc; }
-.options { padding-top: .5em;}
+.ui-menu { background-color: white; border: 1px solid black; border-top: 0;}
+.ui-menu-item { list-style-type: none;}
 
-#focus .context { text-align: right; color: #777;}
+.editable { border: 1px solid transparent; padding: 4px 5px;}
+.editable:hover { border: 1px solid black; background-color: #ffc;}
+.editor { border: 1px solid black; padding: 4px; margin: 0; }
 
-form { margin: 0;}
-#focus table { width: 80%;}
-#item_name { border: 1px solid transparent; padding: 4px 5px;}
-#item_name:hover { border: 1px solid black; background-color: #ffc;}
-#item_name_edit { display: none; }
-#item_name_edit input[type="text"] { border: 1px solid black; font-size: 20px; padding: 4px; width: 90%; margin: 0; }
-#item_name_edit button { font-size: 20px;}
+.remaining { font-style: italic; padding-left: 1em; }
 
-#focus .info { float: right; color: #777; }
-#focus .box { margin-top: 1em;}
-#focus .project { color: #777;}
+#focus { background-color: #ff9; padding: .5em 1em; margin: 1em; }
+#focus table { width: 100%;}
+#focus .options { padding-top: .5em;}
 
-.remaining { padding-left: 1em; color: #777;}
+#focus .context, #focus .info, #focus .project { color: #777;}
+#focus .context { text-align: right;}
+#focus .info { float: right; }
+#focus .project { margin-bottom: 1em;}
+#focus .name, #focus .name input[type="text"], #focus .name button { font-size: 20px; }
+#focus .name .editor { width: 90%; }
+#focus .checkbox { width: 1px; }
+#focus .postponement { display: none; }
 
 .red { background-color: #f33; font-weight: bold; color: white; border: 2px solid #c00;}
 
-.infoline * { font-size: 15px;}
-#mainbox { width: 20em;}
+.editline * { font-size: 15px;}
+.editline #addbox { width: 20em;}
 
-
+#help { display: none; }
 </style>
 
-<p class="remaining"><strong>7 left to go...</strong></p>
+<p class="remaining">
+$if len(focusl):
+    $len(focusl) left to go...
+$else:
+    All done! No more tasks until <a href="@@">@@</a>.
+</p>
+$if focusl:
+    $ focus = focusl[0]
+    <form method="post" action="/edit">
+    <input type="hidden" name="id" value="$focus.id" />
+    <div id="focus">
+      <div class="info">$datestr(focus.created)</div>
+      <div class="project">
+        project:
+        $if focus.project_id: <a href="/p/$focus.project_id">$focus.project_id</a> [x]
+        $else: <span class="editable">...</span>
+      </div>
 
-<div id="focus">
-<div class="info">
-    $datestr(focus.created)
-    <!--@@postponed x times-->
+      <table>
+        <tr class="name">
+          <td class="checkbox"><input type="checkbox" name="finished" value="t" onclick="$$(this).parents('form').submit()"/></td>
+          <td><div class="editable" data-name="name">$focus.name</div></td>
+        </tr><tr>
+          <td></td>
+          <td class="options">
+            <button name="stall" value="t" type="submit">handle</button>
+            <button class="postpone_button">postpone</button>
+            <button name="finished" value="gaveup">give up</button>
+            <button onclick="alert('not implemented yet'); return false">delegate</button>
+        </td>
+    </tr><tr class="postponement"><td></td><td>
+      postpone until:
+      <button name="postpone" value="1 day" type="submit">tomorrow</button>
+      <button name="postpone" value="1 week" type="submit">next week</button>
+      <button name="postpone" value="1 month" type="submit">next month</button>
+      <input type="text" name="postpone_t" />
+      <button name="postpone" value="someday" type="submit">someday</button>
+    </td></tr>
+    </table>
+    <div class="context">context: <span class="editable">...</span></div>
+    </div>
+    </form>
+
+<div class="editline">
+  <form method="post" action="/reset"><button class="red">RESET</button></form>
+  <form method="post" action="/add">
+    <input id="addbox" type="text" name="name"> <button type="submit">Add</button>
+  </form>
 </div>
-<div class="project">
-    project:
-    $if focus.project_id:
-        <a href="/projects/$focus.project_id">$focus.project_id</a> [x]
-    $else:
-        ...
-        
-</div>
 
-<table class="box"><tr class="text">
-    <td style="width: 1px"><input type="checkbox" /></td>
-    <td>
-        <div id="item_name" onclick="edit_item('item_name')" class="editable">$focus.name</div>
-        <div id="item_name_edit">
-            <form method="post" action="/edit_name">
-                <input type="hidden" name="id" value="$focus.id" />
-                <input type="text" name="name" value="$focus.name" onfocus='this.value=this.value' />
-                <button type="submit">save</button>
-            </form>
-        </div>
-    </td>
-</tr><tr>
-    <td></td>
-    <td class="options">
-        <button>stall</button>
-        <button>postpone</button>
-        <button>give up</button>
-        <button>delegate</button>
-    </td>
-</tr>
-</table>
-<div class="context">context: ...</div>
-</div>
-
-
-<form method="post" action="/add">
-
-<div class="infoline"><button class="red">RESET</button> <input id="mainbox" type="text" name="text"> <button type="submit">Add</button></div>
-
+<p>
+$for x in stalled:
+    <form method="post" action="/edit"><input type="checkbox" name="finished" value="t" onclick="$$(this).parents('form').submit()"> $x.name</form><br />
+</p>
 
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.0/jquery.min.js"></script>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.9/jquery-ui.min.js"></script>
 <script type="text/javascript">
-function edit_item(n){
-    $$('#' + n)[0].style.display='none'
-    $$('#' + n+'_edit')[0].style.display='block'
-    $$('#' + n+'_edit input[type="text"]')[0].focus()
+String.prototype.contains = function(searchString){ return (this.indexOf(searchString) != -1);}
+   
+var projects = [{label: 'Dog', value: 7}, { label: 'Sam', value: 3}, {label: 'Example', value: 2}];
+$$('.project-autocomplete').autocomplete({source: find_matching})
+function find_matching(request, response) {
+  var term = request.term;
+  console.log(term)
+  response(projects.filter(function(x){return x['label'].contains(term)}));
 }
+
+$$('.editable').click(function() {
+  var jthis = $$(this);
+  var itemdata = this.innerHTML;
+  if (itemdata == '...') itemdata = '';
+  
+  jthis.hide();
+  jthis.after('\
+    <input class="editor project-autocomplete" type="text" \
+    name="' + jthis.attr('data-name') + '" value="' + itemdata + 
+    '" onfocus="this.value=this.value;" /> \
+    <button type="submit">save</button>');
+  
+  $$('.project-autocomplete').autocomplete({source: find_matching})
+  jthis.parent().find('.editor').focus();
+})
+
+$$('.postpone_button').click(function(){
+  var jthis = $$(this);
+  jthis.parent().hide();
+  jthis.parent().parent().parent().children('.postponement').show();
+  return false;
+})
 </script>
+
+<p><a href="" onclick="$$('#help').toggle(); return false;">What's going on here?</a></p>
+<div id="help">
+<p>rtask is a program to help you get stuff done.</p>
+
+<p>The first principle of rtask is that you'll be happier if everything you need to do isn't nagging at you from the back of your mind, but is stored safely in a program that will remind you when it's appropriate.</p>
+
+<p>There are two kinds of things that nag at us: <strong>tasks</strong> and <strong>projects</strong>. A task is any specific, concrete thing that we need to just sit down and do. A project is anything more complicated than that. It's important to realize that many things that seem like tasks are actually projects. For example, "buy more pens" may seem like a task, but if you don't know which kind of pens to get, it's actually a project with (at least) two tasks: "find the name of that pen I liked", "order that pen from Amazon". If you don't break down projects into tasks that you can concretely do, then you're likely to put them off for later and get stuck.</p>
+
+<p>Projects can even be big things where you don't know what tasks to take at the moment -- or where there aren't any tasks to take at the moment. rtask will remind you weekly to review each project so you can check in and see if there are any tasks to add to it.</p>
+
+<p>The second principle of rtask is that you'll be happier if you're given a handful of tasks to focus on at a time, instead of overwhelmed with hundreds of todos. So rtask works hard to make sure you're only shown a handful of todos at a time.</p>
+
+<p>Not all tasks can be done right now, so tasks have two further properties: <strong>times</strong> and <strong>contexts</strong>. The time is a date when you want to be reminded of a task. Until then, rtask won't bother you with it. A context is a situation where doing the task makes special sense. For example, you may want to keep your grocery list in a "Grocery" context. Then, when you go to the grocery store, you can check the Grocery context and see all the items there.</p>
+
+<p>Contexts can also be other people. For example, "Ask John where he bought that pen" only makes sense when you're talking to John. But in addition to saving the task for when you run into John, rtask lets you "delegate" the task to John. Then instead of being something you have to do, it'll be marked as waiting for John to do it. But the item won't get lost -- it'll still come up during your regular task reviews and you can even nag John about finishing it right from rtask.</p>
+
+<h3>How do I use it?</h3>
+
+<p>Every day, rtask will pick out all the tasks that haven't been processed yet as well as all tasks that have been postponed until that day. Then it will show them to you, one at a time, and ask you what to do with them. You can:</p>
+
+<ul>
+  <li>Do it right now and <strong>check</strong> it off the list</li>
+  <li><strong>Handle</strong> it by adding it to your todo list for the day</li>
+  <li><strong>Postpone</strong> it for a later date</li>
+  <li><strong>Delegate</strong> it to someone else</li>
+  <li><strong>Give up</strong> on it and mark it as something you don't want to do anymore
+</ul>
+
+<p>This gives you a chance to consider what you really want to focus on today, without being overwhelmed by tasks or losing track of the ones you don't focus on. (You can also add tasks to a project or context if they're missing one.)</p>
+
+<p>Below the processing station, rtask will list your tasks for that day, organized by context. Now you should have a short and focused list to guide that day's work. If you ever feel overwhelmed by them, just hit the <strong>RESET</strong> button and process them again.</p>
+
+<p>Then, every week, rtask will add a special task reminding you to review each unreviewed project. This gives you a chance to ensure nothing has slipped through the cracks, while using the same techniques to ensure you don't get overwhelmed by the number of open projects.</p>
+</div>
